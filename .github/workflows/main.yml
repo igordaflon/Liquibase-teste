@@ -12,7 +12,14 @@ jobs:
     runs-on: self-hosted
     
     steps:
+      - name: Fix permissions
+        run: |
+          sudo chmod -R 777 /home/igorcouto/actions-runner/_work/Liquibase-teste || true
+          sudo rm -rf /home/igorcouto/actions-runner/_work/Liquibase-teste || true
+          
       - uses: actions/checkout@v3
+        with:
+          clean: false
       
       - name: Get Docker Network
         id: network
@@ -23,10 +30,10 @@ jobs:
       - name: Validate Liquibase Changelog
         run: |
           docker run --rm \
-          -v /home/igorcouto/git-pessoal/liquibase-teste:/liquibase/changelog \
-          -v /home/igorcouto/git-pessoal/liquibase-teste/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+          --network="${{ env.DOCKER_NETWORK }}" \
+          -v "${{ github.workspace }}:/liquibase/changelog" \
           liquibase/liquibase:4.28.0 \
+          --changelog-file=/liquibase/changelog/changelog-master.xml \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
-          --searchPath=/liquibase/changelog \
           validate
 
