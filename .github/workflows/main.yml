@@ -1,4 +1,4 @@
-name: Pipeline para validar e atualizar o Liquibase Changelog
+name: Pipeline Liquibase
 
 on:
   workflow_dispatch:
@@ -62,5 +62,5 @@ jobs:
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
             --searchPath=/liquibase/changelog \
-            rollback-to-tag ${{ github.event.inputs.rollbackTag }}
+            rollback ${{ github.event.inputs.rollbackTag }}
         fi
