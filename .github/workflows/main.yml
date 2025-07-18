@@ -1,0 +1,33 @@
+name: Liquibase Database Migration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  database-migration:
+    runs-on: self-hosted
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Get Docker Network
+        id: network
+        run: |
+          NETWORK=$(docker network ls --filter name=bridge --format "{{.Name}}")
+          echo "DOCKER_NETWORK=$NETWORK" >> $GITHUB_ENV
+      
+      - name: Validate Liquibase Changelog
+        run: |
+          docker run --rm \
+          --network="${{ env.DOCKER_NETWORK }}" \
+          -v "${{ github.workspace }}:/liquibase/changelog" \
+          -v "${{ github.workspace }}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar" \
+          liquibase/liquibase:4.28.0 \
+          --defaultsFile=/liquibase/changelog/liquibase.properties \
+          --searchPath=/liquibase/changelog \
+          validate
+
