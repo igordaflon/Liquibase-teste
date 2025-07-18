@@ -1,17 +1,25 @@
-name: Liquibase Validate
+name: Pipeline para validar e atualizar o Liquibase Changelog
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Ação desejada'
+        required: true
+        type: choice
+        options:
+          - update
+          - rollback
+      rollbackTag:
+        description: 'Tag para rollback (necessário apenas se a ação for rollback)'
+        required: false
+        type: string
 
 permissions:
   contents: read
   
 jobs:
-  validate:
+  database-changes:
     runs-on: self-hosted
     
     steps:
@@ -20,7 +28,7 @@ jobs:
         clean: false
         persist-credentials: false
       
-    - name: Validate Liquibase Changelog
+    - name: Valida Liquibase Changelog
       run: |
         docker run --rm \
           --user $(id -u):$(id -g) \
@@ -31,13 +39,28 @@ jobs:
           --searchPath=/liquibase/changelog \
           validate
 
-    - name: Update Liquibase Changelog
+    - name: Executa Ação no Banco
       run: |
-        docker run --rm \
-          --user $(id -u):$(id -g) \
-          -v ${PWD}:/liquibase/changelog \
-          -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
-          liquibase/liquibase:4.28.0 \
-          --defaultsFile=/liquibase/changelog/liquibase.properties \
-          --searchPath=/liquibase/changelog \
-          update
+        if [ "${{ github.event.inputs.action }}" = "update" ]; then
+          docker run --rm \
+            --user $(id -u):$(id -g) \
+            -v ${PWD}:/liquibase/changelog \
+            -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            liquibase/liquibase:4.28.0 \
+            --defaultsFile=/liquibase/changelog/liquibase.properties \
+            --searchPath=/liquibase/changelog \
+            update
+        elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
+          if [ -z "${{ github.event.inputs.rollbackTag }}" ]; then
+            echo "Error: Tag para rollback não foi fornecida"
+            exit 1
+          fi
+          docker run --rm \
+            --user $(id -u):$(id -g) \
+            -v ${PWD}:/liquibase/changelog \
+            -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            liquibase/liquibase:4.28.0 \
+            --defaultsFile=/liquibase/changelog/liquibase.properties \
+            --searchPath=/liquibase/changelog \
+            rollback-to-tag ${{ github.event.inputs.rollbackTag }}
+        fi
