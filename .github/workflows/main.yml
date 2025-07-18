@@ -1,39 +1,25 @@
-name: Liquibase Database Migration
+name: Liquibase Validate
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  database-migration:
+  validate:
     runs-on: self-hosted
     
     steps:
-      - name: Fix permissions
-        run: |
-          sudo chmod -R 777 /home/igorcouto/actions-runner/_work/Liquibase-teste || true
-          sudo rm -rf /home/igorcouto/actions-runner/_work/Liquibase-teste || true
-          
-      - uses: actions/checkout@v3
-        with:
-          clean: false
+    - uses: actions/checkout@v4
       
-      - name: Get Docker Network
-        id: network
-        run: |
-          NETWORK=$(docker network ls --filter name=bridge --format "{{.Name}}")
-          echo "DOCKER_NETWORK=$NETWORK" >> $GITHUB_ENV
-      
-      - name: Validate Liquibase Changelog
-        run: |
-          docker run --rm \
-          --network="${{ env.DOCKER_NETWORK }}" \
-          -v "${{ github.workspace }}:/liquibase/changelog" \
+    - name: Validate Liquibase Changelog
+      run: |
+        docker run --rm \
+          -v ${PWD}:/liquibase/changelog \
+          -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
-          --changelog-file=/liquibase/changelog/changelog-master.xml \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
+          --searchPath=/liquibase/changelog \
           validate
-
