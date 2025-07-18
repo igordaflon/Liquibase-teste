@@ -29,17 +29,25 @@ jobs:
         persist-credentials: false
       
     - name: Valida Liquibase Changelog
+      id: validate
       run: |
-        docker run --rm \
+        set -e  # Faz o script falhar se qualquer comando falhar
+        echo "Iniciando validação do changelog..."
+        if ! docker run --rm \
           --user $(id -u):$(id -g) \
           -v ${PWD}:/liquibase/changelog \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
           --searchPath=/liquibase/changelog \
-          validate
+          validate; then
+          echo "::error::Falha na validação do Liquibase Changelog"
+          exit 1
+        fi
+        echo "Validação concluída com sucesso!"
 
     - name: Executa Ação no Banco
+      if: success() 
       run: |
         if [ "${{ github.event.inputs.action }}" = "update" ]; then
           docker run --rm \
