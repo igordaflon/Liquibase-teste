@@ -17,6 +17,7 @@ jobs:
     - name: Validate Liquibase Changelog
       run: |
         docker run --rm \
+          --user $(id -u):$(id -g) \
           -v ${PWD}:/liquibase/changelog \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
