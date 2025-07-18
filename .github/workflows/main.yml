@@ -23,9 +23,8 @@ jobs:
       - name: Validate Liquibase Changelog
         run: |
           docker run --rm \
-          --network="${{ env.DOCKER_NETWORK }}" \
-          -v "${{ github.workspace }}:/liquibase/changelog" \
-          -v "${{ github.workspace }}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar" \
+          -v /home/igorcouto/git-pessoal/liquibase-teste:/liquibase/changelog \
+          -v /home/igorcouto/git-pessoal/liquibase-teste/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
           --searchPath=/liquibase/changelog \
