@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+  <changeSet id="1.5.0" author="liquibase">
+    <tagDatabase tag="1.5.0" />
+  </changeSet>
+
+  <changeSet id="1234567" author="igor.couto">
+    <comment>RELEASE 1.5.0</comment>
+    <sqlFile relativeToChangelogFile="false" dbms="oracle" encoding="UTF-8" path="packages/PCK_SUPP_CAW.sql" endDelimiter="/" />
+
+    <rollback>
+      <sqlFile relativeToChangelogFile="false" dbms="oracle" encoding="UTF-8" path="scripts/1.5.0/PCK_SUPP_CAW-rollback.sql" endDelimiter="/" />
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>
