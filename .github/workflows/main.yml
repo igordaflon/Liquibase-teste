@@ -35,12 +35,13 @@ jobs:
         echo "Iniciando validação do changelog..."
         if ! docker run --rm \
           --user $(id -u):$(id -g) \
-          -v ${PWD}/changelog:/liquibase/changelog \
-          -v ${PWD}/packages:/liquibase/packages \
+          -v ${PWD}:/liquibase/workspace \
+          -v ${PWD}/packages:/liquibase/workspace/packages \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
-          --defaultsFile=/liquibase/changelog/liquibase.properties \
-          --searchPath=/liquibase/changelog,/liquibase/packages \
+          --defaultsFile=/liquibase/workspace/liquibase.properties \
+          --changeLogFile=/liquibase/workspace/changelog-master.xml \
+          --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
           --log-level=DEBUG \
           validate; then
           echo "::error::Falha na validação do Liquibase Changelog"
@@ -54,21 +55,23 @@ jobs:
         if [ "${{ github.event.inputs.action }}" = "update" ]; then
           docker run --rm \
             --user $(id -u):$(id -g) \
-            -v ${PWD}/changelog:/liquibase/changelog \
-            -v ${PWD}/packages:/liquibase/packages \
+            -v ${PWD}:/liquibase/workspace \
+            -v ${PWD}/packages:/liquibase/workspace/packages \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
             liquibase/liquibase:4.28.0 \
-            --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog,/liquibase/packages \
+            --defaultsFile=/liquibase/workspace/liquibase.properties \
+            --changeLogFile=/liquibase/workspace/changelog-master.xml \
+            --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
             update
         elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
           docker run --rm \
             --user $(id -u):$(id -g) \
-            -v ${PWD}/changelog:/liquibase/changelog \
-            -v ${PWD}/packages:/liquibase/packages \
+            -v ${PWD}:/liquibase/workspace \
+            -v ${PWD}/packages:/liquibase/workspace/packages \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
             liquibase/liquibase:4.28.0 \
-            --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog,/liquibase/packages \
+            --defaultsFile=/liquibase/workspace/liquibase.properties \
+            --changeLogFile=/liquibase/workspace/changelog-master.xml \
+            --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
             rollback ${{ github.event.inputs.rollbackTag }}
         fi
