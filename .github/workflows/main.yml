@@ -35,12 +35,11 @@ jobs:
         echo "Iniciando validação do changelog..."
         if ! docker run --rm \
           --user $(id -u):$(id -g) \
-          -v ${PWD}:/liquibase/workspace \
+          -v ${PWD}:/liquibase/changelog \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
-          -v ${PWD}/packages:/liquibase/workspace/packages \
           liquibase/liquibase:4.28.0 \
-          --defaultsFile=/liquibase/workspace/liquibase.properties \
-          --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
+          --defaultsFile=/liquibase/changelog/liquibase.properties \
+          --searchPath=/liquibase/changelog \
           --log-level=DEBUG \
           validate; then
           echo "::error::Falha na validação do Liquibase Changelog"
@@ -54,25 +53,20 @@ jobs:
         if [ "${{ github.event.inputs.action }}" = "update" ]; then
           docker run --rm \
             --user $(id -u):$(id -g) \
-            -v ${PWD}:/liquibase/workspace \
+            -v ${PWD}:/liquibase/changelog \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
-            -v ${PWD}/packages:/liquibase/workspace/packages \
             liquibase/liquibase:4.28.0 \
-            --defaultsFile=/liquibase/workspace/liquibase.properties \
-            --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
+            --defaultsFile=/liquibase/changelog/liquibase.properties \
+            --searchPath=/liquibase/changelog \
             update
         elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
-          if [ -z "${{ github.event.inputs.rollbackTag }}" ]; then
-            echo "Error: Tag para rollback não foi fornecida"
-            exit 1
-          fi
+          # ...existing code...
           docker run --rm \
             --user $(id -u):$(id -g) \
-            -v ${PWD}:/liquibase/workspace \
+            -v ${PWD}:/liquibase/changelog \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
-            -v ${PWD}/packages:/liquibase/workspace/packages \
             liquibase/liquibase:4.28.0 \
-            --defaultsFile=/liquibase/workspace/liquibase.properties \
-            --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
+            --defaultsFile=/liquibase/changelog/liquibase.properties \
+            --searchPath=/liquibase/changelog \
             rollback ${{ github.event.inputs.rollbackTag }}
         fi
