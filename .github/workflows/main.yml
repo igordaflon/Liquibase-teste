@@ -39,7 +39,7 @@ jobs:
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
-          --searchPath=/liquibase/changelog \
+          --searchPath=/liquibase/changelog,/liquibase/changelog/packages \
           validate; then
           echo "::error::Falha na validação do Liquibase Changelog"
           exit 1
@@ -56,7 +56,7 @@ jobs:
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog \
+            --searchPath=/liquibase/changelog,/liquibase/changelog/packages \
             update
         elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
           if [ -z "${{ github.event.inputs.rollbackTag }}" ]; then
@@ -69,6 +69,6 @@ jobs:
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog \
+            --searchPath=/liquibase/changelog,/liquibase/changelog/packages \
             rollback ${{ github.event.inputs.rollbackTag }}
         fi
