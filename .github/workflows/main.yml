@@ -37,6 +37,7 @@ jobs:
           --user $(id -u):$(id -g) \
           -v ${PWD}:/liquibase/changelog \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+          -v ${PWD}/packages:/liquibase/packages \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
           --searchPath=/liquibase/changelog,/liquibase/packages \
@@ -54,6 +55,7 @@ jobs:
             --user $(id -u):$(id -g) \
             -v ${PWD}:/liquibase/changelog \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            -v ${PWD}/packages:/liquibase/packages \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
             --searchPath=/liquibase/changelog,/liquibase/packages \
@@ -67,6 +69,7 @@ jobs:
             --user $(id -u):$(id -g) \
             -v ${PWD}:/liquibase/changelog \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            -v ${PWD}/packages:/liquibase/packages \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
             --searchPath=/liquibase/changelog,/liquibase/packages \
