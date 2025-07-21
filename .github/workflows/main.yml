@@ -35,11 +35,12 @@ jobs:
         echo "Iniciando validação do changelog..."
         if ! docker run --rm \
           --user $(id -u):$(id -g) \
-          -v ${PWD}:/liquibase/changelog \
+          -v ${PWD}/changelog:/liquibase/changelog \
+          -v ${PWD}/packages:/liquibase/packages \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
-          --searchPath=/liquibase/changelog \
+          --searchPath=/liquibase/changelog,/liquibase/packages \
           --log-level=DEBUG \
           validate; then
           echo "::error::Falha na validação do Liquibase Changelog"
@@ -53,20 +54,21 @@ jobs:
         if [ "${{ github.event.inputs.action }}" = "update" ]; then
           docker run --rm \
             --user $(id -u):$(id -g) \
-            -v ${PWD}:/liquibase/changelog \
+            -v ${PWD}/changelog:/liquibase/changelog \
+            -v ${PWD}/packages:/liquibase/packages \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog \
+            --searchPath=/liquibase/changelog,/liquibase/packages \
             update
         elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
-          # ...existing code...
           docker run --rm \
             --user $(id -u):$(id -g) \
-            -v ${PWD}:/liquibase/changelog \
+            -v ${PWD}/changelog:/liquibase/changelog \
+            -v ${PWD}/packages:/liquibase/packages \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog \
+            --searchPath=/liquibase/changelog,/liquibase/packages \
             rollback ${{ github.event.inputs.rollbackTag }}
         fi
