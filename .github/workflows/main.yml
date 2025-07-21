@@ -37,9 +37,11 @@ jobs:
           --user $(id -u):$(id -g) \
           -v ${PWD}:/liquibase/workspace \
           -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+          -v ${PWD}/packages:/liquibase/workspace/packages \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/workspace/liquibase.properties \
-          --searchPath=/liquibase/workspace \
+          --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
+          --log-level=DEBUG \
           validate; then
           echo "::error::Falha na validação do Liquibase Changelog"
           exit 1
@@ -54,9 +56,10 @@ jobs:
             --user $(id -u):$(id -g) \
             -v ${PWD}:/liquibase/workspace \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            -v ${PWD}/packages:/liquibase/workspace/packages \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/workspace/liquibase.properties \
-            --searchPath=/liquibase/workspace \
+            --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
             update
         elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
           if [ -z "${{ github.event.inputs.rollbackTag }}" ]; then
@@ -67,8 +70,9 @@ jobs:
             --user $(id -u):$(id -g) \
             -v ${PWD}:/liquibase/workspace \
             -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            -v ${PWD}/packages:/liquibase/workspace/packages \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/workspace/liquibase.properties \
-            --searchPath=/liquibase/workspace \
+            --searchPath=/liquibase/workspace,/liquibase/workspace/packages \
             rollback ${{ github.event.inputs.rollbackTag }}
         fi
