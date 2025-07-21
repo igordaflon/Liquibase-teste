@@ -1,9 +1,10 @@
 docker run -d --name oracle-xe -p 1521:1521 -e ORACLE_PASSWORD=senha123 gvenzl/oracle-xe:21-slim 
 
 docker run --rm \
-  -v /home/igorcouto/git/liquibase-teste:/liquibase/changelog \
-  -v /home/igorcouto/git/liquibase-teste/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
-  liquibase/liquibase:4.28.0 \
-  --defaultsFile=/liquibase/changelog/liquibase.properties \
-  --searchPath=/liquibase/changelog \
-  validate
+            --user $(id -u):$(id -g) \
+            -v ${PWD}:/liquibase/changelog \
+            -v ${PWD}/lib/ojdbc11.jar:/liquibase/lib/ojdbc11.jar \
+            liquibase/liquibase:4.28.0 \
+            --defaultsFile=/liquibase/changelog/liquibase.properties \
+            --searchPath=/liquibase/changelog \
+            rollback 1.1.0
