@@ -40,7 +40,7 @@ jobs:
           -v ${PWD}:/liquibase/packages \
           liquibase/liquibase:4.28.0 \
           --defaultsFile=/liquibase/changelog/liquibase.properties \
-          --searchPath=/liquibase/changelog,/liquibase/packages \
+          --searchPath=/liquibase/changelog \
           validate; then
           echo "::error::Falha na validação do Liquibase Changelog"
           exit 1
@@ -58,7 +58,7 @@ jobs:
             -v ${PWD}:/liquibase/packages \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog,/liquibase/packages \
+            --searchPath=/liquibase/changelog \
             update
         elif [ "${{ github.event.inputs.action }}" = "rollback" ]; then
           if [ -z "${{ github.event.inputs.rollbackTag }}" ]; then
@@ -72,6 +72,6 @@ jobs:
             -v ${PWD}:/liquibase/packages \
             liquibase/liquibase:4.28.0 \
             --defaultsFile=/liquibase/changelog/liquibase.properties \
-            --searchPath=/liquibase/changelog,/liquibase/packages \
+            --searchPath=/liquibase/changelog \
             rollback ${{ github.event.inputs.rollbackTag }}
         fi
